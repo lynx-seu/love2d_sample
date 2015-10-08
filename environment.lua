@@ -41,10 +41,17 @@ function env.getResRoot()
     return env.res_root
 end
 
+function env.getscale()
+    local s1 = env.getWindowSize()
+    local s2 = env.getCanvasSize()
+    return vec2(s1.x/s2.x, s1.y/s2.y) 
+end
+
 
 return {
     GetWindowSize = env.getWindowSize,
     GetCanvasSize = env.getCanvasSize,
     GetResRoot = env.getResRoot,
+    GetScale = env.getscale,
 }
 

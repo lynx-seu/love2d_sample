@@ -3,7 +3,8 @@ res_root = "assets"
 scene_root = "scenes"
 
 -- global value
-_SceneMgr = require "scenemgr"
+_scenemgr = require "scenemgr"
+_env = require "environment"
 cc = {}     -- namespace
 cc.vec2 = require "hump.vector"
 
