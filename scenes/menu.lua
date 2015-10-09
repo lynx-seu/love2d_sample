@@ -18,9 +18,7 @@ function menu:update(dt)
 end
 
 function menu:keyreleased(key, code)
-    print('key released', key, code)
     if key == 'return' then
-        print('enter released')
         _scenemgr.switch('game')
     end
 end
