@@ -9,7 +9,7 @@ local t = 0
 local angle = 0
 
 function game:init()
-    cam = camera(400, 640)
+    cam = camera(500, 640, 2)
 end
 
 function game:update(dt)
@@ -23,12 +23,12 @@ end
 function game:onDraw()
     love.graphics.circle("line", 0, 0, 100, 8)
     cam:draw(function ()
-        love.graphics.circle("line", 400, 640, 100, 8)
-        lg.print("hello,world", 400, 640)
+        love.graphics.circle("line", 500, 640, 100, 8)
+        lg.print("hello,world", 500, 640)
     end)
 	love.graphics.setPointSize(5)
 	love.graphics.setColor(0, 0, 0xff)
-	love.graphics.point(400, 640)
+	love.graphics.point(500, 640)
 end
 
 return game

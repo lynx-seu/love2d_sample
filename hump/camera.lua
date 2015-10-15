@@ -106,7 +106,7 @@ function camera:attach()
 	--local cx,cy = love.graphics.getWidth()/(2*self.scale), love.graphics.getHeight()/(2*self.scale)
 	love.graphics.push()
 	love.graphics.scale(self.scale)
-	love.graphics.translate(self.x, self.y)
+	love.graphics.translate(self.x/self.scale, self.y/self.scale)
 	love.graphics.rotate(self.rot)
 	love.graphics.translate(-self.x, -self.y)
 end
