@@ -1,6 +1,6 @@
-local _Path = (...):match('^(.+)%.[^%.]+') .. '.'
+local PATH = (...):match('^(.+)%.[^%.]+') .. '.'
 
-local Node = require(_Path .. 'node')
+local Node = require(PATH .. 'node')
 
 local Scene = Node()
 Scene.__index = function(self, key)
@@ -16,10 +16,6 @@ local function new()
     return setmetatable(t, Scene)
 end
 
-local function transferPos(x, y)
-    local scale_x, scale_y = _env.GetScale():unpack()
-    return x*scale_x, y*scale_y
-end
 
 function Scene:draw()
     love.graphics.push()
@@ -29,12 +25,5 @@ function Scene:draw()
 end
 
 function Scene:onDraw() end
-
---function Scene:DrawLine(x1, y1, x2, y2)
-    --x1, y1 = transferPos(x1, y1)
-    --x2, y2 = transferPos(x2, y2)
-    --love.graphics.line(x1, y1, x2, y2)
---end
-
 
 return setmetatable({new=new}, {__call=function(_, ...) return new(...) end})
