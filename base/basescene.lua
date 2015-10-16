@@ -1,4 +1,8 @@
-local Scene = {}
+local _Path = (...):match('^(.+)%.[^%.]+') .. '.'
+
+local Node = require(_Path .. 'node')
+
+local Scene = Node()
 Scene.__index = function(self, key)
     return Scene[key] or (function () 
         local function __null__() end
