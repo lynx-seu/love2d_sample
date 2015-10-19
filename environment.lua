@@ -38,7 +38,7 @@ function env.getCanvasSize()
 end
 
 function env.getResRoot()
-    return env.res_root
+    return env.res_root .. "/"
 end
 
 function env.getscale()

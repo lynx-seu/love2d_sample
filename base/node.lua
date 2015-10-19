@@ -9,7 +9,7 @@ node.children = {}
 
 local function isnode(n)
     return type(n) == "table" and type(n.children) == "table"
-        and type(n.pos) == "number" and type(n.cam) == "table"
+        and vec2.isvector(n.pos) and type(n.cam) == "table"
 end
 
 local function new(pt, zorder, parent)
@@ -27,10 +27,19 @@ local function new(pt, zorder, parent)
     return setmetatable(t, node)
 end
 
-function node:setPosition(pos)
-    self.pos = pos
-    assert(vec2.isvector(pos))
-    cam:lookAt(self.pos.x, self.pos.y)
+function node:setPosition(x, y)
+    if type(x) == "table" then
+        self.pos = x
+        assert(vec2.isvector(x))
+    elseif type(x) == "number" and type(y) == "number" then
+        self.pos = vec2(x, y)
+    end
+    self.cam:lookAt(self.pos.x, self.pos.y)
+end
+
+function node:move(x, y)
+    self:setPosition(x, y)
+    return self
 end
 
 function node:getPosition()
@@ -41,16 +50,34 @@ function node:setAnchorPoint(pt)
     self.anchorPt = pt
 end
 
+function node:getAnchorPoint()
+    return self.anchorPt
+end
+
+function node:setZorder(zorder)
+    zorder = zorder or 0
+    self.zorder = zorder
+    if self.parent then
+        self.parent:sortChildren()
+    end
+end
+
 function node:addTo(parent)
     if not isnode(parent) then error "parent must be a node" end
     if self.parent then error "parent ~= nil" end
     parent:addChild(self)
+    return self
 end
 
 function node:addChild(n)
     if not isnode(n) then error "n must be a node" end
     n.parent = self
     table.insert(self.children, n)
+    self:sortChildren()
+    return self
+end
+
+function node:sortChildren()
     table.sort(self.children, function (a, b)
         return a.zorder < b.zorder
     end)
@@ -62,13 +89,22 @@ function node:removeChild(n)
             return table.remove(self.children, k)
         end
     end
+    return self
 end
 
 function node:removeAllChildren()
     self.children = {}
+    return self
 end
 
 function node:draw()
+    self:onDraw()
+    for _, v in ipairs(self.children) do
+        v:onDraw()
+    end
+end
+
+function node:onDraw()
 end
 
 return setmetatable({new=new}, {__call=function(_, ...) return new(...) end})
