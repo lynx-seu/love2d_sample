@@ -8,25 +8,28 @@ local lg = love.graphics
 local cam
 local t = 0
 local angle = 0
-local sp
+local sp = nil
 
-function game:init()
+function game:enter()
     cam = camera(500, 640, 2)
-    self:addSprite("avtar", Vec2(400, 640))
-    self:addSprite("avtar", Vec2(500, 700), 0, 1)
+    sp = self:addSprite("avtar.png", Vec2(400, 640))
+    --self:addSprite("avtar.png", Vec2(500, 640), 0, 1)
+    self:addSprite("#player", Vec2(100, 30), sp, 1)
 end
 
 function game:update(dt)
-    print(dt)
-    cam:rotate(math.pi/2 * dt)
+    --print(dt)
+    t = t + dt
+    if t <= 10 then
+        cam:rotate(math.pi/2 * dt)
+        sp:rotate(math.pi/2 * dt)
+    else
+        self:removeChild(sp)
+    end
+
 end
 
---function game:draw()
-    --self:onDraw()
---end
-
 function game:onDraw()
-    love.graphics.circle("line", 0, 0, 100, 8)
     cam:draw(function ()
         love.graphics.circle("line", 500, 640, 100, 8)
         lg.print("hello,world", 500, 640)
@@ -36,6 +39,10 @@ function game:onDraw()
 	love.graphics.point(500, 640)
 
 	love.graphics.setColor(0xff, 0xff, 0xff)
+end
+
+function game:onClose()
+    self:switch("menu")
 end
 
 return game

@@ -19,6 +19,7 @@ local env = {
     canvas_size = screen_size.android_3,
     res_root = 'assets',
     external_storage_dir = '',
+    scenes_root = 'scenes',
 }
 
 function env.getWindowSize()
@@ -47,11 +48,15 @@ function env.getscale()
     return vec2(s1.x/s2.x, s1.y/s2.y) 
 end
 
+function env.getScenesRoot()
+    return env.scenes_root .. '.'
+end
 
 return {
     GetWindowSize = env.getWindowSize,
     GetCanvasSize = env.getCanvasSize,
     GetResRoot = env.getResRoot,
     GetScale = env.getscale,
+    GetScenesRoot = env.getScenesRoot,
 }
 

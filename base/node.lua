@@ -1,24 +1,25 @@
 local PATH = (...):match('^(.+)%.[^%.]+') .. '.'
 
-local vec2 = require "hump.vector"
+local Vec2 = require "hump.vector"
 local camera = require "hump.camera"
 
 local node ={}
 node.__index = node
-node.children = {}
 
 local function isnode(n)
-    return type(n) == "table" and type(n.children) == "table"
-        and vec2.isvector(n.pos) and type(n.cam) == "table"
+    return type(n) == "table" and Vec2.isvector(n.pos) 
+            and type(n.cam) == "table"
 end
 
 local function new(pt, zorder, parent)
-    pt = pt or vec2()
+    pt = pt or Vec2()
     zorder = zorder or 0
     parent = parent or nil
     local t = {
         pos = pt,
-        anchorPt = vec2(0.5, 0.5),
+        anchorPtInPoints = Vec2(0,0),
+        anchorPt = Vec2(0, 0),
+        size = Vec2(0, 0),
         zorder = zorder,
         parent = parent,
         cam = camera(pt.x, pt.y)
@@ -27,12 +28,31 @@ local function new(pt, zorder, parent)
     return setmetatable(t, node)
 end
 
+function node:onEnter()
+    for _, v in ipairs(self.children) do
+        v:onEnter()
+    end
+end
+
+function node:onExit()
+    self:removeAllChildren()
+    collectgarbage()
+end
+
+function node:worldPos()
+    assert(self.parent)
+    local v = self.parent:worldPos()
+    local x = v.x + self.pos.x - self.anchorPtInPoints.x
+    local y = v.y + self.pos.y - self.anchorPtInPoints.y
+    return Vec2(x, y)
+end
+
 function node:setPosition(x, y)
     if type(x) == "table" then
         self.pos = x
-        assert(vec2.isvector(x))
+        assert(Vec2.isvector(x))
     elseif type(x) == "number" and type(y) == "number" then
-        self.pos = vec2(x, y)
+        self.pos = Vec2(x, y)
     end
     self.cam:lookAt(self.pos.x, self.pos.y)
 end
@@ -42,16 +62,31 @@ function node:move(x, y)
     return self
 end
 
+function node:rotate(angle)
+    self.cam:rotate(angle)
+end
+
 function node:getPosition()
     return self.pos
 end
 
 function node:setAnchorPoint(pt)
-    self.anchorPt = pt
+    if self.anchorPt ~= pt then
+        self.anchorPt = pt
+        self.anchorPtInPoints = Vec2(self.size.x * pt.x, self.size.y * pt.y)
+    end
 end
 
 function node:getAnchorPoint()
     return self.anchorPt
+end
+
+function node:setSize(w, h)
+    self.size.x, self.size.y = w, h 
+end
+
+function node:getSize()
+    return self.size
 end
 
 function node:setZorder(zorder)
@@ -72,6 +107,7 @@ end
 function node:addChild(n)
     if not isnode(n) then error "n must be a node" end
     n.parent = self
+    self.children = self.children or {}
     table.insert(self.children, n)
     self:sortChildren()
     return self
@@ -84,8 +120,10 @@ function node:sortChildren()
 end
 
 function node:removeChild(n)
+    self.children = self.children or {}
     for k, v in ipairs(self.children) do
         if v == n then
+            n:onExit()
             return table.remove(self.children, k)
         end
     end
@@ -93,15 +131,23 @@ function node:removeChild(n)
 end
 
 function node:removeAllChildren()
+    self.children = self.children or {}
+    for _, v in ipairs(self.children) do
+        v:onExit()
+    end
     self.children = {}
     return self
 end
 
 function node:draw()
-    self:onDraw()
-    for _, v in ipairs(self.children) do
-        v:onDraw()
-    end
+    self.cam:attach()
+        self:onDraw()
+        if self.children then 
+            for _, v in ipairs(self.children) do
+                v:onDraw()
+            end
+        end
+    self.cam:detach()
 end
 
 function node:onDraw()

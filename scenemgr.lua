@@ -1,15 +1,15 @@
 local mgr = {}
 
 local GS = require "hump.gamestate"
-local scene_root = scene_root or "scenes"
 
 function mgr.run()
     GS.registerEvents()
-    mgr.switch('menu')
+    mgr.switch(_env.GetScenesRoot() .. 'menu')
 end
 
 function mgr.switch(scene)
-    local s = require(scene_root .. '.' .. scene)
+    local s = require(scene)
+    s.mod = scene
     GS.switch(s)
 end
 

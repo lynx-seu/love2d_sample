@@ -1,12 +1,16 @@
 -- config
-res_root = "assets"
-scene_root = "scenes"
+GAME_RES = {
+    "main"
+}
+
+require "helpfunc"
 
 -- global value
 _scenemgr = require "scenemgr"
 _env = require "environment"
 cc = {}     -- namespace
 cc.vec2 = require "hump.vector"
+cc.rect = require "base.rect"
 
 -- forbid the global
 setmetatable(_G, {
